@@ -1,14 +1,6 @@
 use strict;
 use warnings;
 
-
-##############################
-# Refuse to work with sufficiently broken systems
-if($^O =~ m/MSWin/) {
-    die "Sorry, Alien::FFTW3 doesn't work for Microsoft Windows.\n\n  Maybe someone will fix it for Microsoft systems.\n\n  Maybe that someone is you.";
-}
-
-
 ##############################
 # Microsoft is not the only group with a broken system.  Some Linuxen
 # (e.g. F***ing Fedora) break the FFTW3 configure script by putting
@@ -27,43 +19,46 @@ if($^O =~ m/MSWin/) {
 # into a place where pkg-config looks by defauls, so that it will find
 # them.  So try some heuristics here.
 
-my $s = `pkg-config --variable pc_path pkg-config`;
-unless($s) {
-    die "Couldn't run pkg-config! I give up.";
-}
-chomp($s);
-my @pkg_config_dirs = split /\:/,$s;
-
 my $first_lib64 = "";
 my $first_lib = "";
 my $first_share_pc = "";
-for my $d(@pkg_config_dirs) {
-    $first_lib64    = $d if( !$first_lib64    and  $d=~ s:(.*\/lib64)\/pkgconfig$:$1: );
-    $first_lib      = $d if( !$first_lib      and  $d=~ s:(.*\/lib)\/pkgconfig$:$1: );
-    $first_share_pc = $d if( !$first_share_pc and  $d=~ m:.*\/share\/pkgconfig$: );
-}
-
 my $bonus_install_command = "";
-my $dest_libdir = $first_lib || $first_lib64 || "";
-my $prefix = "%s";
+my $dest_libdir = "";
+my $prefix = "";
 
-if($dest_libdir) {
-    my $s = $dest_libdir;
-    if( $s =~ s:(.*)\/[^\/]+:$1: ) {  # lop off the final directory (lib part)
-	$prefix = $s;
-    }
-} else {
-    if($first_share_pc) {
-	$bonus_install_command = "mv %s/lib/pkgconfig/fftw*.pc $first_share_pc";
-    } else {
-	die "Couldn't figure out a reasonable place to stick the pkg-config files for fftw.\n  Sorry, you're on your own.";
-    }
-}
+if (my $s = `pkg-config --variable pc_path pkg-config`) {
+  chomp($s);
+  my @pkg_config_dirs = split /\:/,$s;
+  
+  for my $d(@pkg_config_dirs) {
+      $first_lib64    = $d if( !$first_lib64    and  $d=~ s:(.*\/lib64)\/pkgconfig$:$1: );
+      $first_lib      = $d if( !$first_lib      and  $d=~ s:(.*\/lib)\/pkgconfig$:$1: );
+      $first_share_pc = $d if( !$first_share_pc and  $d=~ m:.*\/share\/pkgconfig$: );
+  }
+  
+  $dest_libdir = $first_lib || $first_lib64 || "";
+  $prefix = "%s";
+  
+  if($dest_libdir) {
+      my $s = $dest_libdir;
+      if( $s =~ s:(.*)\/[^\/]+:$1: ) {  # lop off the final directory (lib part)
+  	$prefix = $s;
+      }
+  } else {
+      if($first_share_pc) {
+  	$bonus_install_command = "mv %s/lib/pkgconfig/fftw*.pc $first_share_pc";
+      } else {
+  	die "Couldn't figure out a reasonable place to stick the pkg-config files for fftw.\n  Sorry, you're on your own.";
+      }
+  }
+}  
 
 my $alien_install_commands = [];
 my $alien_build_commands = [];
 
 unless(`pkg-config --libs fftw3`) {
+    die "fftw3 library not found and I am not able to build it on MS Windows" if $^O eq 'MSWin32';
+
     print <<"FOO";
 Alien::FFTW3: fftw3 library not found.  On "Build", I will fetch and build
 the fftw3 library.  on "Build install" I will install it into the '$prefix' tree 
@@ -89,11 +84,11 @@ $alien_install_commands =  [
     "echo 'cd .fftw-double-build; make install' | sh",
     "echo 'cd .fftw-float-build; make install' | sh",
     $bonus_install_command || "echo 1"
-]
+];
+
+print "alien_build_commands is:\n",map { "    $_\n" } @$alien_build_commands;
 
 }
-    
-print "alien_build_commands is:\n",map { "    $_\n" } @$alien_build_commands;
 
 ##############################
 # Finally -- do the building.
@@ -137,9 +132,9 @@ my $builder = Alien::Base::ModuleBuild->new (
     
     meta_merge => {
 	resources => {
-	    homepage => 'https://github.com/drzowie/alien-fftw3',
-	    bugtracker => 'https://github.com/drzowie/alien-fftw3/issues',
-	    repository => 'git://github.com/ddrzowie/alien-fftw3.git'
+	    homepage => 'https://github.com/drzowie/Alien-FFTW3',
+	    bugtracker => 'https://github.com/drzowie/Alien-FFTW3/issues',
+	    repository => 'git://github.com/ddrzowie/Alien-FFTW3.git'
 	}
     }
     );
