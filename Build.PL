@@ -109,7 +109,7 @@ my $builder = Alien::Base::ModuleBuild->new (
     dynamic_config => 1,
     license => 'perl',
     configure_requires => {
-	'Alien::Base' => '0.002',
+	'Alien::Base::ModuleBuild' => '0.002',
 	'Module::Build' => '0.38'
     },
     requires => {
