@@ -78,9 +78,16 @@ use parent 'Alien::Base';
 
 our $pkgconfig;
 BEGIN {
-   $pkgconfig = `which pkg-config`;
-   chomp $pkgconfig;
-   die "pkg-config not found, required for Alien::FFTW3 to work" unless($pkgconfig  and  -e $pkgconfig  and  -x $pkgconfig );
+   if ($^O eq 'MSWin32') {
+     # no 'which' on MS Windows but 'pkg-config' might be installed
+     $pkgconfig = 'pkg-config' if `pkg-config --version`;
+   }
+   else {
+     $pkgconfig = `which pkg-config`;
+     chomp $pkgconfig;
+     $pkgconfig = undef unless -e $pkgconfig  and  -x $pkgconfig;
+   }
+   die "pkg-config not found, required for Alien::FFTW3 to work" unless $pkgconfig;
 }
 
 
