@@ -73,7 +73,7 @@ use strict;
 use warnings;
 
 # $VERSION is here for CPAN to parse -- but there is a sub below to pull the fftw library version.
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use parent 'Alien::Base';
 
 our $pkgconfig;

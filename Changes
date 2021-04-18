@@ -1,7 +1,5 @@
-Revision history for Perl module Alien::FFTW3
-
-0.04 YYY-MM-DD
-    - minimal MS Windows support (detect pre-installed fftw3 via pkg-config)
+0.04 2021-04-18
+- minimal MS Windows support (detect pre-installed fftw3 via pkg-config) - thanks @kmx
 
 0.03 2013-10-28
 
