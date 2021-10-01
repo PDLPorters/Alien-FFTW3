@@ -132,9 +132,9 @@ my $builder = Alien::Base::ModuleBuild->new (
     
     meta_merge => {
 	resources => {
-	    homepage => 'https://github.com/drzowie/Alien-FFTW3',
-	    bugtracker => 'https://github.com/drzowie/Alien-FFTW3/issues',
-	    repository => 'git://github.com/ddrzowie/Alien-FFTW3.git'
+	    homepage => 'https://github.com/PDLPorters/Alien-FFTW3',
+	    bugtracker => 'https://github.com/PDLPorters/Alien-FFTW3/issues',
+	    repository => 'git://github.com/PDLPorters/Alien-FFTW3.git'
 	}
     }
     );
