@@ -37,6 +37,7 @@ if (my $s = `pkg-config --variable pc_path pkg-config`) {
   }
   
   $dest_libdir = $first_lib || $first_lib64 || "";
+  undef $dest_libdir if $> != 0; # not root
   $prefix = "%s";
   
   if($dest_libdir) {
@@ -45,10 +46,8 @@ if (my $s = `pkg-config --variable pc_path pkg-config`) {
   	$prefix = $s;
       }
   } else {
-      if($first_share_pc) {
+      if($first_share_pc && $> == 0) {
   	$bonus_install_command = "mv %s/lib/pkgconfig/fftw*.pc $first_share_pc";
-      } else {
-  	die "Couldn't figure out a reasonable place to stick the pkg-config files for fftw.\n  Sorry, you're on your own.";
       }
   }
 }  
