@@ -76,8 +76,15 @@ use warnings;
 our $VERSION = '0.04';
 use parent 'Alien::Base';
 
+use Env qw(@PKG_CONFIG_PATH);
+use File::Spec;
+
 our $pkgconfig;
 BEGIN {
+   unshift @PKG_CONFIG_PATH, File::Spec->catfile(
+     __PACKAGE__->dist_dir,
+     qw(lib pkgconfig)
+   ) if __PACKAGE__->install_type('share');
    if ($^O eq 'MSWin32') {
      # no 'which' on MS Windows but 'pkg-config' might be installed
      $pkgconfig = 'pkg-config' if `pkg-config --version`;
